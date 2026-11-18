@@ -51,8 +51,8 @@ shodh-workflow-reviewer/
 ### 1. Environment Setup
 ```bash
 # Clone the repository
-git clone https://github.com/NiladriPal/shodh-workflow-reviewer.git
-cd shodh-workflow-reviewer
+git clone https://github.com/niladripalmca24-cyber/Shodh-Ai-Assessment.git
+cd Shodh-Ai-Assessment
 
 # Create and activate virtual environment
 python -m venv venv
