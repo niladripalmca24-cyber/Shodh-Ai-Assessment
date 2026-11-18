@@ -1,0 +1,186 @@
+{
+  "bundle_id": "04_defect_paired_boundary",
+  "name": "Defective Paired Boundary Bug (> 1500 vs >= 1500)",
+  "description": "Paired variant to bundle 03 that subtly changes operator >= to >.",
+  "source_requirements": [
+    {
+      "id": "RULE_ESCAL",
+      "title": "Long wait",
+      "description": "Waiting >= 25m escalates",
+      "order": 3,
+      "condition_dsl": "wait_seconds >= 1500",
+      "target_queue": "escalation",
+      "location": {
+        "artifact_id": "doc.md",
+        "version": "1.0",
+        "location": "doc:line_3"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "RULE_CAT_MISS",
+      "title": "Missing category",
+      "description": "Missing category routes to manual review",
+      "order": 1,
+      "condition_dsl": "IS_MISSING(category)",
+      "target_queue": "manual_review",
+      "location": {
+        "artifact_id": "doc.md",
+        "version": "1.0",
+        "location": "doc:line_1"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "RULE_PRIO",
+      "title": "Urgent",
+      "description": "Urgent tickets route to priority",
+      "order": 2,
+      "condition_dsl": "urgent == True",
+      "target_queue": "priority_queue",
+      "location": {
+        "artifact_id": "doc.md",
+        "version": "1.0",
+        "location": "doc:line_2"
+      },
+      "version": "1.0"
+    }
+  ],
+  "approval_records": [],
+  "specification_rules": [
+    {
+      "id": "RULE_CAT_MISS",
+      "title": "Missing category",
+      "condition_dsl": "IS_MISSING(category)",
+      "target_queue": "manual_review",
+      "precedence": 1,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "spec:1"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "RULE_PRIO",
+      "title": "Urgent",
+      "condition_dsl": "urgent == True",
+      "target_queue": "priority_queue",
+      "precedence": 2,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "spec:2"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "RULE_ESCAL",
+      "title": "Long wait",
+      "condition_dsl": "wait_seconds > 1500",
+      "target_queue": "escalation",
+      "precedence": 3,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "spec:3"
+      },
+      "version": "1.0"
+    }
+  ],
+  "workflow_graph": {
+    "version": "1.0",
+    "entry_node_id": "node_1",
+    "nodes": {
+      "node_1": {
+        "id": "node_1",
+        "node_type": "condition",
+        "condition_dsl": "IS_MISSING(category)",
+        "next_node_true": "act_manual",
+        "next_node_false": "node_2",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:1"
+        }
+      },
+      "act_manual": {
+        "id": "act_manual",
+        "node_type": "action",
+        "action_queue": "manual_review",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_manual"
+        }
+      },
+      "node_2": {
+        "id": "node_2",
+        "node_type": "condition",
+        "condition_dsl": "urgent == True",
+        "next_node_true": "act_priority",
+        "next_node_false": "node_3",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:2"
+        }
+      },
+      "act_priority": {
+        "id": "act_priority",
+        "node_type": "action",
+        "action_queue": "priority_queue",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_priority"
+        }
+      },
+      "node_3": {
+        "id": "node_3",
+        "node_type": "condition",
+        "condition_dsl": "wait_seconds > 1500",
+        "next_node_true": "act_escalate",
+        "next_node_false": "act_normal",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:3"
+        }
+      },
+      "act_escalate": {
+        "id": "act_escalate",
+        "node_type": "action",
+        "action_queue": "escalation",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_escalate"
+        }
+      },
+      "act_normal": {
+        "id": "act_normal",
+        "node_type": "action",
+        "action_queue": "normal_queue",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_normal"
+        }
+      }
+    }
+  },
+  "python_snippet": {
+    "version": "1.0",
+    "function_name": "route_ticket",
+    "code": "def route_ticket(ticket):\n    if ticket.get('category') is None:\n        return 'manual_review'\n    if ticket.get('urgent') == True:\n        return 'priority_queue'\n    if ticket.get('wait_seconds') > 1500:\n        return 'escalation'\n    return 'normal_queue'\n",
+    "location": {
+      "artifact_id": "python_router.py",
+      "version": "1.0",
+      "location": "py:fn_route:line_1"
+    }
+  },
+  "prose_metadata": {
+    "unstructured_text": "Boundary defect: wait > 1500 excludes exact 25m boundary."
+  }
+}

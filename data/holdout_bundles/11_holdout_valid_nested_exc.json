@@ -1,0 +1,235 @@
+{
+  "bundle_id": "11_holdout_valid_nested_exc",
+  "name": "Frozen Holdout: Valid Nested VIP Exception & Units",
+  "description": "Unseen rule IDs with VIP exception and hour/minute unit canonicalization.",
+  "source_requirements": [
+    {
+      "id": "R_VIP",
+      "title": "VIP override",
+      "description": "VIP customers route to vip_queue",
+      "order": 1,
+      "condition_dsl": "vip == True",
+      "target_queue": "vip_queue",
+      "location": {
+        "artifact_id": "policy.md",
+        "version": "1.0",
+        "location": "doc:l1"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R_CAT",
+      "title": "Missing Category",
+      "description": "Missing category routes to manual review",
+      "order": 2,
+      "condition_dsl": "IS_MISSING(category)",
+      "target_queue": "manual_review",
+      "location": {
+        "artifact_id": "policy.md",
+        "version": "1.0",
+        "location": "doc:l2"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R_URG",
+      "title": "Urgent",
+      "description": "Urgent routes to priority",
+      "order": 3,
+      "condition_dsl": "urgent == True",
+      "target_queue": "priority_queue",
+      "location": {
+        "artifact_id": "policy.md",
+        "version": "1.0",
+        "location": "doc:l3"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R_WAIT",
+      "title": "Long wait",
+      "description": "Waiting >= 1 hour escalates",
+      "order": 4,
+      "condition_dsl": "wait_seconds >= 3600",
+      "target_queue": "escalation",
+      "location": {
+        "artifact_id": "policy.md",
+        "version": "1.0",
+        "location": "doc:l4"
+      },
+      "version": "1.0"
+    }
+  ],
+  "approval_records": [],
+  "specification_rules": [
+    {
+      "id": "R_VIP",
+      "title": "VIP override",
+      "condition_dsl": "vip == True",
+      "target_queue": "vip_queue",
+      "precedence": 1,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "s:1"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R_CAT",
+      "title": "Missing Category",
+      "condition_dsl": "IS_MISSING(category)",
+      "target_queue": "manual_review",
+      "precedence": 2,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "s:2"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R_URG",
+      "title": "Urgent",
+      "condition_dsl": "urgent == True",
+      "target_queue": "priority_queue",
+      "precedence": 3,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "s:3"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R_WAIT",
+      "title": "Long wait",
+      "condition_dsl": "wait_seconds >= 3600",
+      "target_queue": "escalation",
+      "precedence": 4,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "s:4"
+      },
+      "version": "1.0"
+    }
+  ],
+  "workflow_graph": {
+    "version": "1.0",
+    "entry_node_id": "node_vip",
+    "nodes": {
+      "node_vip": {
+        "id": "node_vip",
+        "node_type": "condition",
+        "condition_dsl": "vip == True",
+        "next_node_true": "act_vip",
+        "next_node_false": "node_cat",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:vip"
+        }
+      },
+      "act_vip": {
+        "id": "act_vip",
+        "node_type": "action",
+        "action_queue": "vip_queue",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_vip"
+        }
+      },
+      "node_cat": {
+        "id": "node_cat",
+        "node_type": "condition",
+        "condition_dsl": "IS_MISSING(category)",
+        "next_node_true": "act_cat",
+        "next_node_false": "node_urg",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:cat"
+        }
+      },
+      "act_cat": {
+        "id": "act_cat",
+        "node_type": "action",
+        "action_queue": "manual_review",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_cat"
+        }
+      },
+      "node_urg": {
+        "id": "node_urg",
+        "node_type": "condition",
+        "condition_dsl": "urgent == True",
+        "next_node_true": "act_urg",
+        "next_node_false": "node_wait",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:urg"
+        }
+      },
+      "act_urg": {
+        "id": "act_urg",
+        "node_type": "action",
+        "action_queue": "priority_queue",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_urg"
+        }
+      },
+      "node_wait": {
+        "id": "node_wait",
+        "node_type": "condition",
+        "condition_dsl": "wait_seconds >= 3600",
+        "next_node_true": "act_wait",
+        "next_node_false": "act_norm",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:wait"
+        }
+      },
+      "act_wait": {
+        "id": "act_wait",
+        "node_type": "action",
+        "action_queue": "escalation",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_wait"
+        }
+      },
+      "act_norm": {
+        "id": "act_norm",
+        "node_type": "action",
+        "action_queue": "normal_queue",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_norm"
+        }
+      }
+    }
+  },
+  "python_snippet": {
+    "version": "1.0",
+    "function_name": "route_ticket",
+    "code": "def route_ticket(ticket):\n    if ticket.get('vip') == True:\n        return 'vip_queue'\n    if ticket.get('category') is None:\n        return 'manual_review'\n    if ticket.get('urgent') == True:\n        return 'priority_queue'\n    if ticket.get('wait_seconds') >= 3600:\n        return 'escalation'\n    return 'normal_queue'\n",
+    "location": {
+      "artifact_id": "python_router.py",
+      "version": "1.0",
+      "location": "py:fn_route:line_1"
+    }
+  },
+  "prose_metadata": {
+    "unstructured_text": "VIP customers receive dedicated support triage."
+  }
+}

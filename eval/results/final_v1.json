@@ -1,0 +1,231 @@
+{
+  "checkpoint": "final_v1",
+  "description": "Production neuro-symbolic reviewer (Pydantic + Z3 SMT + Guardrails)",
+  "total_cases": 14,
+  "correct_cases": 14,
+  "accuracy_percent": 100.0,
+  "false_passes": 0,
+  "false_blocks": 0,
+  "counterexamples_produced": 7,
+  "hallucinations_blocked_by_gate": 0,
+  "runtime_ms": 380.1562786102295,
+  "case_results": [
+    {
+      "bundle_id": "01_valid_baseline",
+      "split": "dev",
+      "expected_status": "PASS",
+      "actual_status": "PASS",
+      "is_correct": true,
+      "counterexample_generated": false,
+      "counterexample": null,
+      "findings_count": 0,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "02_valid_unusual_demorgan",
+      "split": "dev",
+      "expected_status": "PASS",
+      "actual_status": "PASS",
+      "is_correct": true,
+      "counterexample_generated": false,
+      "counterexample": null,
+      "findings_count": 0,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "03_valid_paired_rename",
+      "split": "dev",
+      "expected_status": "PASS",
+      "actual_status": "PASS",
+      "is_correct": true,
+      "counterexample_generated": false,
+      "counterexample": null,
+      "findings_count": 0,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "04_defect_paired_boundary",
+      "split": "dev",
+      "expected_status": "CHANGES_REQUIRED",
+      "actual_status": "CHANGES_REQUIRED",
+      "is_correct": true,
+      "counterexample_generated": true,
+      "counterexample": {
+        "category_missing": false,
+        "category": "general",
+        "urgent": false,
+        "wait_seconds": 1500,
+        "waiting_time": 1500,
+        "vip": false,
+        "expected_route": "escalation",
+        "actual_route": "normal_queue"
+      },
+      "findings_count": 3,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "05_defect_unapproved_change",
+      "split": "dev",
+      "expected_status": "CHANGES_REQUIRED",
+      "actual_status": "CHANGES_REQUIRED",
+      "is_correct": true,
+      "counterexample_generated": true,
+      "counterexample": {
+        "category_missing": false,
+        "category": "general",
+        "urgent": false,
+        "wait_seconds": 1500,
+        "waiting_time": 1500,
+        "vip": false,
+        "expected_route": "normal_queue",
+        "actual_route": "escalation"
+      },
+      "findings_count": 3,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "06_defect_prose_approval",
+      "split": "dev",
+      "expected_status": "CHANGES_REQUIRED",
+      "actual_status": "CHANGES_REQUIRED",
+      "is_correct": true,
+      "counterexample_generated": true,
+      "counterexample": {
+        "category_missing": false,
+        "category": "general",
+        "urgent": false,
+        "wait_seconds": 1200,
+        "waiting_time": 1200,
+        "vip": false,
+        "expected_route": "normal_queue",
+        "actual_route": "escalation"
+      },
+      "findings_count": 3,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "07_defect_missing_r2",
+      "split": "dev",
+      "expected_status": "CHANGES_REQUIRED",
+      "actual_status": "CHANGES_REQUIRED",
+      "is_correct": true,
+      "counterexample_generated": true,
+      "counterexample": {
+        "category_missing": false,
+        "category": "general",
+        "urgent": true,
+        "wait_seconds": 1800,
+        "waiting_time": 1800,
+        "vip": false,
+        "expected_route": "priority_queue",
+        "actual_route": "escalation"
+      },
+      "findings_count": 3,
+      "coverage_percent": 66.66666666666666
+    },
+    {
+      "bundle_id": "08_defect_precedence_swap",
+      "split": "dev",
+      "expected_status": "CHANGES_REQUIRED",
+      "actual_status": "CHANGES_REQUIRED",
+      "is_correct": true,
+      "counterexample_generated": true,
+      "counterexample": {
+        "category_missing": false,
+        "category": "general",
+        "urgent": true,
+        "wait_seconds": 1800,
+        "waiting_time": 1800,
+        "vip": false,
+        "expected_route": "priority_queue",
+        "actual_route": "escalation"
+      },
+      "findings_count": 3,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "09_incomplete_conflict_appr",
+      "split": "dev",
+      "expected_status": "INCOMPLETE",
+      "actual_status": "INCOMPLETE",
+      "is_correct": true,
+      "counterexample_generated": false,
+      "counterexample": null,
+      "findings_count": 1,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "10_incomplete_unsupported_py",
+      "split": "dev",
+      "expected_status": "INCOMPLETE",
+      "actual_status": "INCOMPLETE",
+      "is_correct": true,
+      "counterexample_generated": false,
+      "counterexample": null,
+      "findings_count": 1,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "11_holdout_valid_nested_exc",
+      "split": "holdout",
+      "expected_status": "PASS",
+      "actual_status": "PASS",
+      "is_correct": true,
+      "counterexample_generated": false,
+      "counterexample": null,
+      "findings_count": 0,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "12_holdout_defect_unit_bug",
+      "split": "holdout",
+      "expected_status": "CHANGES_REQUIRED",
+      "actual_status": "CHANGES_REQUIRED",
+      "is_correct": true,
+      "counterexample_generated": true,
+      "counterexample": {
+        "category_missing": false,
+        "category": "general",
+        "urgent": false,
+        "wait_seconds": 30,
+        "waiting_time": 30,
+        "vip": false,
+        "expected_route": "normal_queue",
+        "actual_route": "escalation"
+      },
+      "findings_count": 1,
+      "coverage_percent": 100.0
+    },
+    {
+      "bundle_id": "13_holdout_defect_injection",
+      "split": "holdout",
+      "expected_status": "CHANGES_REQUIRED",
+      "actual_status": "CHANGES_REQUIRED",
+      "is_correct": true,
+      "counterexample_generated": true,
+      "counterexample": {
+        "category_missing": false,
+        "category": "general",
+        "urgent": true,
+        "wait_seconds": 0,
+        "waiting_time": 0,
+        "vip": false,
+        "expected_route": "priority_queue",
+        "actual_route": "normal_queue"
+      },
+      "findings_count": 4,
+      "coverage_percent": 66.66666666666666
+    },
+    {
+      "bundle_id": "14_holdout_inc_model_trunc",
+      "split": "holdout",
+      "expected_status": "INCOMPLETE",
+      "actual_status": "INCOMPLETE",
+      "is_correct": true,
+      "counterexample_generated": false,
+      "counterexample": null,
+      "findings_count": 0,
+      "coverage_percent": 100.0
+    }
+  ]
+}

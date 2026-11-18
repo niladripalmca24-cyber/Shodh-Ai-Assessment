@@ -1,0 +1,204 @@
+{
+  "bundle_id": "02_valid_unusual_demorgan",
+  "name": "Valid Unusual De Morgan Formulation",
+  "description": "Logically equivalent specification using negated bounds not (wait_seconds < 1500).",
+  "source_requirements": [
+    {
+      "id": "R1",
+      "title": "Missing category",
+      "description": "Missing category routes to manual review",
+      "order": 1,
+      "condition_dsl": "IS_MISSING(category)",
+      "target_queue": "manual_review",
+      "location": {
+        "artifact_id": "policy.md",
+        "version": "1.0",
+        "location": "doc:line_10"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R2",
+      "title": "Urgent ticket",
+      "description": "Urgent tickets route to priority queue",
+      "order": 2,
+      "condition_dsl": "urgent == True",
+      "target_queue": "priority_queue",
+      "location": {
+        "artifact_id": "policy.md",
+        "version": "1.0",
+        "location": "doc:line_11"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R3",
+      "title": "Long waiting",
+      "description": "Waiting >= 30 minutes escalates",
+      "order": 3,
+      "condition_dsl": "wait_seconds >= 1800",
+      "target_queue": "escalation",
+      "location": {
+        "artifact_id": "policy.md",
+        "version": "1.0",
+        "location": "doc:line_12"
+      },
+      "version": "1.0"
+    }
+  ],
+  "approval_records": [
+    {
+      "id": "APP_01",
+      "target_rule_id": "R3",
+      "attribute": "threshold",
+      "old_value": "1800",
+      "new_value": "1500",
+      "status": "APPROVED",
+      "revision": 2,
+      "sequence_order": 1,
+      "author": "lead@shodh.ai",
+      "timestamp": "2026-11-10T10:00:00Z",
+      "location": {
+        "artifact_id": "approvals.json",
+        "version": "1.0",
+        "location": "rec:APP_01"
+      }
+    }
+  ],
+  "specification_rules": [
+    {
+      "id": "R1",
+      "title": "Missing Category",
+      "condition_dsl": "IS_MISSING(category)",
+      "target_queue": "manual_review",
+      "precedence": 1,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "spec:rule_1"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R2",
+      "title": "Urgent Ticket",
+      "condition_dsl": "not (urgent == False)",
+      "target_queue": "priority_queue",
+      "precedence": 2,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "spec:rule_2"
+      },
+      "version": "1.0"
+    },
+    {
+      "id": "R3",
+      "title": "Escalation",
+      "condition_dsl": "not (wait_seconds < 1500)",
+      "target_queue": "escalation",
+      "precedence": 3,
+      "location": {
+        "artifact_id": "spec.json",
+        "version": "1.0",
+        "location": "spec:rule_3"
+      },
+      "version": "1.0"
+    }
+  ],
+  "workflow_graph": {
+    "version": "1.0",
+    "entry_node_id": "node_1",
+    "nodes": {
+      "node_1": {
+        "id": "node_1",
+        "node_type": "condition",
+        "condition_dsl": "IS_MISSING(category)",
+        "next_node_true": "act_manual",
+        "next_node_false": "node_2",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:node_1"
+        }
+      },
+      "act_manual": {
+        "id": "act_manual",
+        "node_type": "action",
+        "action_queue": "manual_review",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_manual"
+        }
+      },
+      "node_2": {
+        "id": "node_2",
+        "node_type": "condition",
+        "condition_dsl": "urgent == True",
+        "next_node_true": "act_priority",
+        "next_node_false": "node_3",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:node_2"
+        }
+      },
+      "act_priority": {
+        "id": "act_priority",
+        "node_type": "action",
+        "action_queue": "priority_queue",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_priority"
+        }
+      },
+      "node_3": {
+        "id": "node_3",
+        "node_type": "condition",
+        "condition_dsl": "wait_seconds >= 1500",
+        "next_node_true": "act_escalate",
+        "next_node_false": "act_normal",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:node_3"
+        }
+      },
+      "act_escalate": {
+        "id": "act_escalate",
+        "node_type": "action",
+        "action_queue": "escalation",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_escalate"
+        }
+      },
+      "act_normal": {
+        "id": "act_normal",
+        "node_type": "action",
+        "action_queue": "normal_queue",
+        "location": {
+          "artifact_id": "wf.json",
+          "version": "1.0",
+          "location": "wf:act_normal"
+        }
+      }
+    }
+  },
+  "python_snippet": {
+    "version": "1.0",
+    "function_name": "route_ticket",
+    "code": "def route_ticket(ticket):\n    if ticket.get('category') is None:\n        return 'manual_review'\n    if ticket.get('urgent') == True:\n        return 'priority_queue'\n    if ticket.get('wait_seconds') >= 1500:\n        return 'escalation'\n    return 'normal_queue'\n",
+    "location": {
+      "artifact_id": "python_router.py",
+      "version": "1.0",
+      "location": "py:fn_route:line_1"
+    }
+  },
+  "prose_metadata": {
+    "unstructured_text": "Logically equivalent formulations tested."
+  }
+}
