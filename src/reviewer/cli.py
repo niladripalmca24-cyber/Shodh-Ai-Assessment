@@ -1,20 +1,45 @@
 from __future__ import annotations
 import argparse
+import glob
 import json
+import os
 import sys
 from typing import Optional
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse
 import uvicorn
 
 from reviewer.engine import ReviewEngine
 from reviewer.model_client import FakeModelClient
 from reviewer.schemas import ReviewBundle, ReviewResult
+from reviewer.web_ui import HTML_CONTENT
 
 app = FastAPI(
     title="Shodh AI - Workflow Reviewer Service",
     description="Neuro-symbolic verification API for support ticket routing workflows",
     version="1.0.0",
 )
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+
+@app.get("/", response_class=HTMLResponse)
+def index():
+    return HTMLResponse(content=HTML_CONTENT)
+
+
+@app.get("/api/bundles/{bundle_id}")
+def get_bundle(bundle_id: str):
+    dev_path = os.path.join(DATA_DIR, "dev_bundles", f"{bundle_id}.json")
+    holdout_path = os.path.join(DATA_DIR, "holdout_bundles", f"{bundle_id}.json")
+    target = dev_path if os.path.exists(dev_path) else holdout_path
+
+    if not os.path.exists(target):
+        raise HTTPException(status_code=404, detail=f"Bundle '{bundle_id}' not found")
+
+    with open(target, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 @app.post("/review", response_model=ReviewResult)

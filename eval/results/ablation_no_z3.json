@@ -7,7 +7,7 @@
   "false_passes": 2,
   "false_blocks": 2,
   "counterexamples_produced": 0,
-  "runtime_ms": 45.00102996826172,
+  "runtime_ms": 34.998416900634766,
   "case_results": [
     {
       "bundle_id": "01_valid_baseline",
